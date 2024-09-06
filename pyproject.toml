@@ -1,0 +1,52 @@
+[project]
+name = "mandoline"
+dynamic = ["version"]
+description = "Official Python client for the Mandoline API"
+readme = "README.md"
+authors = [
+    {name = "Mandoline AI", email = "support@mandoline.ai"},
+]
+license = {text = "Apache-2.0"}
+dependencies = [
+    "httpx>=0.26.0",
+    "pydantic>=2.8.2"
+]
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+keywords = ["mandoline", "ai", "metrics", "evaluation", "api"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.2",
+    "hatch>=1.12.0"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "mandoline/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mandoline"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/mandoline",
+]
+
+[tool.hatch.build.targets.wheel.force-include]
+"mandoline/py.typed" = "mandoline/py.typed"

@@ -1,0 +1,3 @@
+mandoline==0.1.1
+openai==1.41.0
+anthropic==0.34.0
