@@ -121,12 +121,12 @@ class Mandoline:
         metric_create = MetricCreate(name=name, description=description, tags=tags)
 
         data = self._post(endpoint="metrics/", data=metric_create.model_dump())
-        return Metric(**data)
+        return Metric.model_validate(data)
 
     def get_metric(self, *, metric_id: UUID) -> Metric:
         """Fetches a specific metric by its unique identifier."""
         data = self._get(endpoint=f"metrics/{metric_id}")
-        return Metric(**data)
+        return Metric.model_validate(data)
 
     def get_metrics(
         self,
@@ -139,7 +139,7 @@ class Mandoline:
         """Retrieve a list of metrics with optional filtering."""
         params = process_get_options(skip=skip, limit=limit, tags=tags, filters=filters)
         data = self._get(endpoint="metrics/", params=params)
-        return [Metric(**metric_data) for metric_data in data]
+        return [Metric.model_validate(metric_data) for metric_data in data]
 
     def update_metric(
         self,
@@ -159,7 +159,7 @@ class Mandoline:
         data = self._put(
             endpoint=f"metrics/{metric_id}", data=metric_update.model_dump()
         )
-        return Metric(**data)
+        return Metric.model_validate(data)
 
     def delete_metric(self, *, metric_id: UUID) -> None:
         """Removes a metric permanently."""
@@ -187,7 +187,7 @@ class Mandoline:
             data = self._post(
                 endpoint="evaluations/", data=evaluation_create.model_dump()
             )
-            evaluation = Evaluation(**data)
+            evaluation = Evaluation.model_validate(data)
 
             evaluations.append(evaluation)
         return evaluations
@@ -206,12 +206,12 @@ class Mandoline:
         )
 
         data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
-        return Evaluation(**data)
+        return Evaluation.model_validate(data)
 
     def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
         """Fetches details of a specific evaluation."""
         data = self._get(endpoint=f"evaluations/{evaluation_id}")
-        return Evaluation(**data)
+        return Evaluation.model_validate(data)
 
     def get_evaluations(
         self,
@@ -231,7 +231,7 @@ class Mandoline:
             filters=filters,
         )
         data = self._get(endpoint="evaluations/", params=params)
-        return [Evaluation(**evaluation_data) for evaluation_data in data]
+        return [Evaluation.model_validate(evaluation_data) for evaluation_data in data]
 
     def update_evaluation(
         self,
@@ -245,7 +245,7 @@ class Mandoline:
         data = self._put(
             endpoint=f"evaluations/{evaluation_id}", data=evaluation_update.model_dump()
         )
-        return Evaluation(**data)
+        return Evaluation.model_validate(data)
 
     def delete_evaluation(self, *, evaluation_id: UUID) -> None:
         """Removes an evaluation permanently."""

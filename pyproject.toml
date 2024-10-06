@@ -8,8 +8,8 @@ authors = [
 ]
 license = {text = "Apache-2.0"}
 dependencies = [
-    "httpx>=0.26.0",
-    "pydantic>=2.8.2"
+    "httpx>=0.23.0, <1",
+    "pydantic>=1.9.0, <3",
 ]
 requires-python = ">=3.7"
 classifiers = [
@@ -32,6 +32,10 @@ dev = [
     "pytest>=8.3.2",
     "hatch>=1.12.0"
 ]
+
+[project.urls]
+Homepage = "https://github.com/mandoline-ai/mandoline-python#readme"
+Repository = "https://github.com/mandoline-ai/mandoline-python.git"
 
 [build-system]
 requires = ["hatchling"]
