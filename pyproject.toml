@@ -8,8 +8,8 @@ authors = [
 ]
 license = {text = "Apache-2.0"}
 dependencies = [
-    "httpx>=0.26.0",
-    "pydantic>=2.8.2"
+    "httpx>=0.23.0, <1",
+    "pydantic>=1.9.0, <3",
 ]
 requires-python = ">=3.7"
 classifiers = [
