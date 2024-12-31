@@ -57,6 +57,21 @@ def mock_evaluation_data():
 
 
 @pytest.fixture
+def mock_vision_evaluation_data():
+    return {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "metric_id": "234e5678-e89b-12d3-a456-426614174000",
+        "prompt": "Test prompt",
+        "prompt_image": "data:image/png;base64,abc123",
+        "response_image": "data:image/jpeg;base64,def456",
+        "properties": {"key": "value"},
+        "score": 0.42,
+        "created_at": "2023-01-01T00:00:00Z",
+        "updated_at": "2023-01-01T00:00:00Z",
+    }
+
+
+@pytest.fixture
 def mock_httpx_response(mock_metric_data):
     return httpx.Response(
         status_code=200,
@@ -286,6 +301,34 @@ def test_create_evaluation(mock_make_request, mandoline_client, mock_evaluation_
     assert evaluation.prompt == mock_evaluation_data["prompt"]
     assert evaluation.response == mock_evaluation_data["response"]
     assert evaluation.properties == mock_evaluation_data["properties"]
+
+    mock_make_request.assert_called_once()
+
+
+@patch("mandoline.connection_manager.make_request_with_timeout")
+def test_create_vision_evaluation(
+    mock_make_request, mandoline_client, mock_vision_evaluation_data
+):
+    mock_response = httpx.Response(
+        status_code=200,
+        json=mock_vision_evaluation_data,
+        request=httpx.Request("POST", "https://test.api.com/evaluations/"),
+    )
+    mock_make_request.return_value = mock_response
+
+    metric_id = UUID(mock_vision_evaluation_data["metric_id"])
+    evaluation = mandoline_client.create_evaluation(
+        metric_id=metric_id,
+        prompt=mock_vision_evaluation_data["prompt"],
+        prompt_image=mock_vision_evaluation_data["prompt_image"],
+        response_image=mock_vision_evaluation_data["response_image"],
+        properties=mock_vision_evaluation_data["properties"],
+    )
+
+    assert isinstance(evaluation, Evaluation)
+    assert evaluation.prompt_image == mock_vision_evaluation_data["prompt_image"]
+    assert evaluation.response_image == mock_vision_evaluation_data["response_image"]
+    assert evaluation.properties == mock_vision_evaluation_data["properties"]
 
     mock_make_request.assert_called_once()
 
