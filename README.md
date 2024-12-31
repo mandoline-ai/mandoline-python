@@ -113,4 +113,4 @@ For detailed information about the available methods and their parameters, pleas
 
 ## License
 
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0. See the [LICENSE](https://github.com/mandoline-ai/mandoline-python/blob/be1bf45ec120ddaff9de7be3ddb37d2860e93f46/LICENSE) file for details.
