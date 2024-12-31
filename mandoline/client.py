@@ -171,24 +171,26 @@ class Mandoline:
         *,
         metrics: List[Metric],
         prompt: str,
-        response: str,
+        response: Optional[str] = None,
+        prompt_image: Optional[str] = None,
+        response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> List[Evaluation]:
-        """Performs evaluations across multiple metrics for a given prompt-response pair."""
+        """Performs evaluations across multiple metrics."""
         evaluations = []
         for metric in metrics:
             evaluation_create = EvaluationCreate(
                 metric_id=metric.id,
                 prompt=prompt,
                 response=response,
+                prompt_image=prompt_image,
+                response_image=response_image,
                 properties=properties,
             )
-
             data = self._post(
                 endpoint="evaluations/", data=evaluation_create.model_dump()
             )
             evaluation = Evaluation.model_validate(data)
-
             evaluations.append(evaluation)
         return evaluations
 
@@ -197,14 +199,20 @@ class Mandoline:
         *,
         metric_id: UUID,
         prompt: str,
-        response: str,
+        response: Optional[str] = None,
+        prompt_image: Optional[str] = None,
+        response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> Evaluation:
-        """Performs an evaluation for a single metric on a prompt-response pair."""
+        """Performs a single evaluation."""
         evaluation_create = EvaluationCreate(
-            metric_id=metric_id, prompt=prompt, response=response, properties=properties
+            metric_id=metric_id,
+            prompt=prompt,
+            response=response,
+            prompt_image=prompt_image,
+            response_image=response_image,
+            properties=properties,
         )
-
         data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
         return Evaluation.model_validate(data)
 
