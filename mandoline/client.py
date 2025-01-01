@@ -201,8 +201,8 @@ class Mandoline:
         *,
         metric_id: UUID,
         prompt: str,
-        response: Optional[str] = None,
         prompt_image: Optional[str] = None,
+        response: Optional[str] = None,
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> Evaluation:
@@ -210,8 +210,8 @@ class Mandoline:
         evaluation_create = EvaluationCreate(
             metric_id=metric_id,
             prompt=prompt,
-            response=response,
             prompt_image=prompt_image,
+            response=response,
             response_image=response_image,
             properties=properties,
         )

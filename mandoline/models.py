@@ -79,9 +79,9 @@ class EvaluationBase(MandolineBase):
 
     @model_validator(mode="before")
     def validate_response_fields(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        prompt_image = values.get("prompt_image")
         response = values.get("response")
         response_image = values.get("response_image")
-        prompt_image = values.get("prompt_image")
 
         # Validate response requirements
         if response is None and response_image is None:
