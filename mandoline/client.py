@@ -176,7 +176,7 @@ class Mandoline:
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> List[Evaluation]:
-        """Performs evaluations across multiple metrics."""
+        """Performs evaluations across multiple metrics for a given prompt-response pair."""
         evaluations = []
         for metric in metrics:
             evaluation_create = EvaluationCreate(
@@ -187,10 +187,12 @@ class Mandoline:
                 response_image=response_image,
                 properties=properties,
             )
+
             data = self._post(
                 endpoint="evaluations/", data=evaluation_create.model_dump()
             )
             evaluation = Evaluation.model_validate(data)
+
             evaluations.append(evaluation)
         return evaluations
 
@@ -204,7 +206,7 @@ class Mandoline:
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> Evaluation:
-        """Performs a single evaluation."""
+        """Performs an evaluation for a single metric on a prompt-response pair."""
         evaluation_create = EvaluationCreate(
             metric_id=metric_id,
             prompt=prompt,
@@ -213,6 +215,7 @@ class Mandoline:
             response_image=response_image,
             properties=properties,
         )
+
         data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
         return Evaluation.model_validate(data)
 
