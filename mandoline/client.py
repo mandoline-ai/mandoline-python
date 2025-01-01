@@ -171,7 +171,9 @@ class Mandoline:
         *,
         metrics: List[Metric],
         prompt: str,
-        response: str,
+        prompt_image: Optional[str] = None,
+        response: Optional[str] = None,
+        response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> List[Evaluation]:
         """Performs evaluations across multiple metrics for a given prompt-response pair."""
@@ -180,7 +182,9 @@ class Mandoline:
             evaluation_create = EvaluationCreate(
                 metric_id=metric.id,
                 prompt=prompt,
+                prompt_image=prompt_image,
                 response=response,
+                response_image=response_image,
                 properties=properties,
             )
 
@@ -197,12 +201,19 @@ class Mandoline:
         *,
         metric_id: UUID,
         prompt: str,
-        response: str,
+        prompt_image: Optional[str] = None,
+        response: Optional[str] = None,
+        response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> Evaluation:
         """Performs an evaluation for a single metric on a prompt-response pair."""
         evaluation_create = EvaluationCreate(
-            metric_id=metric_id, prompt=prompt, response=response, properties=properties
+            metric_id=metric_id,
+            prompt=prompt,
+            prompt_image=prompt_image,
+            response=response,
+            response_image=response_image,
+            properties=properties,
         )
 
         data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
