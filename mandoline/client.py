@@ -188,6 +188,29 @@ class Mandoline:
         self._delete(endpoint=f"metrics/{metric_id}")
 
     # Evaluation methods
+    def create_evaluation(
+        self,
+        *,
+        metric_id: UUID,
+        prompt: str,
+        prompt_image: Optional[str] = None,
+        response: Optional[str] = None,
+        response_image: Optional[str] = None,
+        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+    ) -> Evaluation:
+        """Performs an evaluation for a single metric on a prompt-response pair."""
+        evaluation_create = EvaluationCreate(
+            metric_id=metric_id,
+            prompt=prompt,
+            prompt_image=prompt_image,
+            response=response,
+            response_image=response_image,
+            properties=properties,
+        )
+
+        data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
+        return Evaluation.model_validate(data)
+
     def batch_create_evaluations(
         self,
         *,
@@ -217,29 +240,6 @@ class Mandoline:
 
             evaluations.append(evaluation)
         return evaluations
-
-    def create_evaluation(
-        self,
-        *,
-        metric_id: UUID,
-        prompt: str,
-        prompt_image: Optional[str] = None,
-        response: Optional[str] = None,
-        response_image: Optional[str] = None,
-        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> Evaluation:
-        """Performs an evaluation for a single metric on a prompt-response pair."""
-        evaluation_create = EvaluationCreate(
-            metric_id=metric_id,
-            prompt=prompt,
-            prompt_image=prompt_image,
-            response=response,
-            response_image=response_image,
-            properties=properties,
-        )
-
-        data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
-        return Evaluation.model_validate(data)
 
     def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
         """Fetches details of a specific evaluation."""
