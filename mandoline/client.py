@@ -188,7 +188,7 @@ class Mandoline:
         self._delete(endpoint=f"metrics/{metric_id}")
 
     # Evaluation methods
-    def evaluate(
+    def batch_create_evaluations(
         self,
         *,
         metrics: List[Metric],
@@ -198,7 +198,7 @@ class Mandoline:
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> List[Evaluation]:
-        """Performs evaluations across multiple metrics for a given prompt-response pair."""
+        """Performs evaluations across multiple metrics for a given prompt-response pair (convenience method)."""
         evaluations = []
         for metric in metrics:
             evaluation_create = EvaluationCreate(
