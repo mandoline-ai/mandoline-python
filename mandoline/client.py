@@ -58,7 +58,7 @@ class Mandoline:
     def _get_auth_header(self) -> Headers:
         if not self.api_key:
             raise ValueError(
-                "API key not provided and MANDOLINE_API_KEY environment variable is not set."
+                "Mandoline API key required. Set MANDOLINE_API_KEY environment variable or create one at https://mandoline.ai/account"
             )
         return {"X-API-KEY": self.api_key}
 
