@@ -3,7 +3,12 @@ import os
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from mandoline.config import DEFAULT_GET_LIMIT, MAX_GET_LIMIT, MandolineRequestConfig
+from mandoline.config import (
+    DEFAULT_GET_LIMIT,
+    DEFAULT_INCLUDE_EVALUATION_CONTENT,
+    MAX_GET_LIMIT,
+    MandolineRequestConfig,
+)
 from mandoline.connection_manager import RequestOptions, make_request
 from mandoline.models import (
     Evaluation,
@@ -230,6 +235,7 @@ class Mandoline:
         skip: int = 0,
         limit: int = DEFAULT_GET_LIMIT,
         metric_id: Union[UUID, NotGiven] = NOT_GIVEN,
+        include_content: Union[bool, NotGiven] = NOT_GIVEN,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
         filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
     ) -> List[Evaluation]:
@@ -238,6 +244,7 @@ class Mandoline:
             skip=skip,
             limit=limit,
             metric_id=metric_id,
+            include_content=include_content,
             properties=properties,
             filters=filters,
         )
@@ -272,10 +279,14 @@ def process_get_options(
     limit: int,
     tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
     metric_id: Union[UUID, NotGiven] = NOT_GIVEN,
+    include_content: Union[bool, NotGiven] = NOT_GIVEN,
     properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
 ) -> SerializableDict:
     params: SerializableDict = {"skip": skip, "limit": limit}
+
+    if include_content == (not DEFAULT_INCLUDE_EVALUATION_CONTENT):
+        params["include_content"] = include_content
 
     _filters: SerializableDict = {}
 

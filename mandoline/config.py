@@ -10,6 +10,8 @@ MAX_GET_LIMIT: Final[int] = 1000
 CONNECT_TIMEOUT: Final[float] = 10.0
 RWP_TIMEOUT: Final[float] = 300.0
 
+DEFAULT_INCLUDE_EVALUATION_CONTENT: bool = True
+
 
 class MandolineRequestConfig(BaseModel):
     """Configuration for Mandoline API requests."""
