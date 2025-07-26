@@ -77,6 +77,8 @@ class EvaluationBase(MandolineBase):
         default_factory=lambda: NOT_GIVEN
     )
 
+
+class EvaluationCreate(EvaluationBase):
     @model_validator(mode="before")
     def validate_response_fields(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         prompt_image = values.get("prompt_image")
@@ -102,10 +104,6 @@ class EvaluationBase(MandolineBase):
                     raise ValueError("Image must be base64 encoded")
 
         return values
-
-
-class EvaluationCreate(EvaluationBase):
-    pass
 
 
 class EvaluationUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
