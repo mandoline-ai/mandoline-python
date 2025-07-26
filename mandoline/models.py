@@ -69,7 +69,7 @@ class Metric(MetricBase, IDAndTimestampsMixin):
 
 class EvaluationBase(MandolineBase):
     metric_id: UUID
-    prompt: str
+    prompt: Optional[str] = None
     prompt_image: Optional[str] = None
     response: Optional[str] = None
     response_image: Optional[str] = None
