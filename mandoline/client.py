@@ -128,6 +128,23 @@ class Mandoline:
         data = self._post(endpoint="metrics/", data=metric_create.model_dump())
         return Metric.model_validate(data)
 
+    def batch_create_metrics(
+        self,
+        *,
+        metrics: List[MetricCreate],
+    ) -> List[Metric]:
+        """Creates multiple metrics in a batch (convenience method)."""
+        created_metrics: List[Metric] = []
+        for metric_create in metrics:
+            metric = self.create_metric(
+                name=metric_create.name,
+                description=metric_create.description,
+                tags=metric_create.tags,
+            )
+            created_metrics.append(metric)
+
+        return created_metrics
+
     def get_metric(self, *, metric_id: UUID) -> Metric:
         """Fetches a specific metric by its unique identifier."""
         data = self._get(endpoint=f"metrics/{metric_id}")
