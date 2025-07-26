@@ -214,31 +214,26 @@ class Mandoline:
     def batch_create_evaluations(
         self,
         *,
-        metrics: List[Metric],
+        metric_ids: List[UUID],
         prompt: str,
         prompt_image: Optional[str] = None,
         response: Optional[str] = None,
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
     ) -> List[Evaluation]:
-        """Performs evaluations across multiple metrics for a given prompt-response pair (convenience method)."""
-        evaluations = []
-        for metric in metrics:
-            evaluation_create = EvaluationCreate(
-                metric_id=metric.id,
+        """Performs evaluations across multiple metrics for a given prompt‑response pair (convenience method)."""
+        evaluations: List[Evaluation] = []
+        for metric_id in metric_ids:
+            evaluation = self.create_evaluation(
+                metric_id=metric_id,
                 prompt=prompt,
                 prompt_image=prompt_image,
                 response=response,
                 response_image=response_image,
                 properties=properties,
             )
-
-            data = self._post(
-                endpoint="evaluations/", data=evaluation_create.model_dump()
-            )
-            evaluation = Evaluation.model_validate(data)
-
             evaluations.append(evaluation)
+
         return evaluations
 
     def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
