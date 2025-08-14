@@ -3,7 +3,7 @@ from uuid import UUID
 
 import pytest
 
-from mandoline.models import EvaluationBase, Metric, MetricUpdate
+from mandoline.models import EvaluationBase, EvaluationCreate, Metric, MetricUpdate
 from mandoline.types import NotGiven
 from mandoline.utils import NOT_GIVEN
 
@@ -82,14 +82,14 @@ def test_evaluation_base_invalid_no_response():
     with pytest.raises(
         ValueError, match="Either response or response_image must be provided"
     ):
-        EvaluationBase(
+        EvaluationCreate(
             metric_id=UUID("123e4567-e89b-12d3-a456-426614174000"), prompt="Test prompt"
         )
 
 
 def test_evaluation_base_invalid_image_format():
     with pytest.raises(ValueError, match="Image must start with data:image/"):
-        EvaluationBase(
+        EvaluationCreate(
             metric_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
             prompt="Test prompt",
             response="Test response",
@@ -99,7 +99,7 @@ def test_evaluation_base_invalid_image_format():
 
 def test_evaluation_base_invalid_image_not_base64():
     with pytest.raises(ValueError, match="Image must be base64 encoded"):
-        EvaluationBase(
+        EvaluationCreate(
             metric_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
             prompt="Test prompt",
             response="Test response",

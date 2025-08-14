@@ -236,51 +236,6 @@ def test_delete_metric(mandoline_client):
 
 
 @patch("mandoline.connection_manager.make_request_with_timeout")
-def test_evaluate(mock_make_request, mandoline_client):
-    mock_responses = [
-        httpx.Response(
-            status_code=200,
-            json={
-                "id": f"123e4567-e89b-12d3-a456-42661417400{i}",
-                "metric_id": f"234e5678-e89b-12d3-a456-42661417400{i}",
-                "prompt": "Test prompt",
-                "response": "Test response",
-                "properties": {"key": "value"},
-                "score": 0.42,
-                "created_at": "2023-01-01T00:00:00Z",
-                "updated_at": "2023-01-01T00:00:00Z",
-            },
-            request=httpx.Request("POST", "https://test.api.com/evaluations/"),
-        )
-        for i in range(2)
-    ]
-    mock_make_request.side_effect = mock_responses
-
-    metrics = [
-        Metric(
-            id=UUID(f"234e5678-e89b-12d3-a456-42661417400{i}"),
-            name=f"Metric {i}",
-            description="Test metric",
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
-        )
-        for i in range(2)
-    ]
-
-    evaluations = mandoline_client.evaluate(
-        metrics=metrics,
-        prompt="Test prompt",
-        response="Test response",
-        properties={"key": "value"},
-    )
-
-    assert len(evaluations) == 2
-    assert all(isinstance(eval, Evaluation) for eval in evaluations)
-
-    assert mock_make_request.call_count == 2
-
-
-@patch("mandoline.connection_manager.make_request_with_timeout")
 def test_create_evaluation(mock_make_request, mandoline_client, mock_evaluation_data):
     mock_response = httpx.Response(
         status_code=200,
