@@ -1,3 +1,4 @@
+from .async_client import AsyncMandoline
 from .client import Mandoline
 from .errors import MandolineError
 from .models import (
@@ -19,6 +20,7 @@ from .types import (
 __version__ = "0.4.0"
 
 __all__ = [
+    "AsyncMandoline",
     "Evaluation",
     "EvaluationCreate",
     "EvaluationUpdate",

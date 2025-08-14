@@ -128,22 +128,6 @@ class Mandoline:
         data = self._post(endpoint="metrics/", data=metric_create.model_dump())
         return Metric.model_validate(data)
 
-    def batch_create_metrics(
-        self,
-        *,
-        metrics: List[MetricCreate],
-    ) -> List[Metric]:
-        """Creates multiple metrics in a batch (convenience method)."""
-        created_metrics: List[Metric] = []
-        for metric_create in metrics:
-            metric = self.create_metric(
-                name=metric_create.name,
-                description=metric_create.description,
-                tags=metric_create.tags,
-            )
-            created_metrics.append(metric)
-
-        return created_metrics
 
     def get_metric(self, *, metric_id: UUID) -> Metric:
         """Fetches a specific metric by its unique identifier."""
@@ -211,30 +195,6 @@ class Mandoline:
         data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
         return Evaluation.model_validate(data)
 
-    def batch_create_evaluations(
-        self,
-        *,
-        metric_ids: List[UUID],
-        prompt: str,
-        prompt_image: Optional[str] = None,
-        response: Optional[str] = None,
-        response_image: Optional[str] = None,
-        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Evaluation]:
-        """Performs evaluations across multiple metrics for a given prompt‑response pair (convenience method)."""
-        evaluations: List[Evaluation] = []
-        for metric_id in metric_ids:
-            evaluation = self.create_evaluation(
-                metric_id=metric_id,
-                prompt=prompt,
-                prompt_image=prompt_image,
-                response=response,
-                response_image=response_image,
-                properties=properties,
-            )
-            evaluations.append(evaluation)
-
-        return evaluations
 
     def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
         """Fetches details of a specific evaluation."""
