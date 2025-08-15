@@ -1,15 +1,12 @@
-import json
 import os
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from mandoline.async_connection_manager import make_async_request, make_concurrent_requests
-from mandoline.config import (
-    DEFAULT_GET_LIMIT,
-    DEFAULT_INCLUDE_EVALUATION_CONTENT,
-    MAX_GET_LIMIT,
-    MandolineRequestConfig,
+from mandoline.async_connection_manager import (
+    make_async_request,
+    make_concurrent_requests,
 )
+from mandoline.config import DEFAULT_GET_LIMIT, MAX_GET_LIMIT, MandolineRequestConfig
 from mandoline.connection_manager import RequestOptions
 from mandoline.models import (
     Evaluation,
@@ -67,7 +64,9 @@ class AsyncMandoline:
             )
         return {"X-API-KEY": self.api_key}
 
-    async def _get(self, *, endpoint: str, params: Optional[SerializableDict] = None) -> Any:
+    async def _get(
+        self, *, endpoint: str, params: Optional[SerializableDict] = None
+    ) -> Any:
         if params and params.get("limit") and params["limit"] > MAX_GET_LIMIT:
             raise ValueError(
                 f"Limit exceeds maximum allowed value of {MAX_GET_LIMIT}. Please reduce the limit."
@@ -143,12 +142,12 @@ class AsyncMandoline:
             )
             for metric in metrics
         ]
-        
+
         results = await make_concurrent_requests(
             config=self.request_config,
             requests=requests,
         )
-        
+
         return [Metric.model_validate(result) for result in results]
 
     async def get_metric(self, *, metric_id: UUID) -> Metric:
@@ -214,7 +213,9 @@ class AsyncMandoline:
             properties=properties,
         )
 
-        data = await self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
+        data = await self._post(
+            endpoint="evaluations/", data=evaluation_create.model_dump()
+        )
         return Evaluation.model_validate(data)
 
     async def batch_create_evaluations(
@@ -232,12 +233,12 @@ class AsyncMandoline:
             )
             for evaluation in evaluations
         ]
-        
+
         results = await make_concurrent_requests(
             config=self.request_config,
             requests=requests,
         )
-        
+
         return [Evaluation.model_validate(result) for result in results]
 
     async def batch_create_evaluations_for_metrics(
@@ -262,7 +263,7 @@ class AsyncMandoline:
             )
             for metric_id in metric_ids
         ]
-        
+
         return await self.batch_create_evaluations(evaluations=evaluations)
 
     async def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
@@ -309,5 +310,3 @@ class AsyncMandoline:
     async def delete_evaluation(self, *, evaluation_id: UUID) -> None:
         """Removes an evaluation permanently."""
         await self._delete(endpoint=f"evaluations/{evaluation_id}")
-
-

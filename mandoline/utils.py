@@ -3,7 +3,12 @@ from typing import Any, Dict, Optional, Union
 from uuid import UUID
 
 from mandoline.config import DEFAULT_INCLUDE_EVALUATION_CONTENT
-from mandoline.types import NotGiven, NullableSerializableDict, NullableStringArray, SerializableDict
+from mandoline.types import (
+    NotGiven,
+    NullableSerializableDict,
+    NullableStringArray,
+    SerializableDict,
+)
 
 NOT_GIVEN = NotGiven()  # singleton
 

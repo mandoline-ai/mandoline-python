@@ -1,14 +1,17 @@
 import asyncio
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from httpx import AsyncClient, Response, Timeout
-from pydantic import BaseModel
 
 from mandoline.config import MandolineRequestConfig
-from mandoline.connection_manager import RequestOptions, process_response, process_url, process_request_body
+from mandoline.connection_manager import (
+    RequestOptions,
+    process_request_body,
+    process_response,
+    process_url,
+)
 from mandoline.errors import handle_error
 from mandoline.logger import get_logger
-from mandoline.types import SerializableDict
 
 logger = get_logger(__name__)
 
@@ -32,7 +35,9 @@ async def make_async_request_with_timeout(
         return response
 
 
-async def make_async_request(*, config: MandolineRequestConfig, options: RequestOptions) -> Any:
+async def make_async_request(
+    *, config: MandolineRequestConfig, options: RequestOptions
+) -> Any:
     url = process_url(
         api_base_url=config.api_base_url,
         endpoint=options.endpoint,

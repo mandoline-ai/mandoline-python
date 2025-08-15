@@ -1,14 +1,8 @@
-import json
 import os
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from mandoline.config import (
-    DEFAULT_GET_LIMIT,
-    DEFAULT_INCLUDE_EVALUATION_CONTENT,
-    MAX_GET_LIMIT,
-    MandolineRequestConfig,
-)
+from mandoline.config import DEFAULT_GET_LIMIT, MAX_GET_LIMIT, MandolineRequestConfig
 from mandoline.connection_manager import RequestOptions, make_request
 from mandoline.models import (
     Evaluation,
@@ -128,7 +122,6 @@ class Mandoline:
         data = self._post(endpoint="metrics/", data=metric_create.model_dump())
         return Metric.model_validate(data)
 
-
     def get_metric(self, *, metric_id: UUID) -> Metric:
         """Fetches a specific metric by its unique identifier."""
         data = self._get(endpoint=f"metrics/{metric_id}")
@@ -195,7 +188,6 @@ class Mandoline:
         data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
         return Evaluation.model_validate(data)
 
-
     def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
         """Fetches details of a specific evaluation."""
         data = self._get(endpoint=f"evaluations/{evaluation_id}")
@@ -240,5 +232,3 @@ class Mandoline:
     def delete_evaluation(self, *, evaluation_id: UUID) -> None:
         """Removes an evaluation permanently."""
         self._delete(endpoint=f"evaluations/{evaluation_id}")
-
-
