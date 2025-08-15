@@ -2,8 +2,12 @@ import os
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
+from mandoline.async_connection_manager import (
+    make_async_request,
+    make_concurrent_requests,
+)
 from mandoline.config import DEFAULT_GET_LIMIT, MAX_GET_LIMIT, MandolineRequestConfig
-from mandoline.connection_manager import RequestOptions, make_request
+from mandoline.connection_manager import RequestOptions
 from mandoline.models import (
     Evaluation,
     EvaluationCreate,
@@ -22,13 +26,12 @@ from mandoline.types import (
 from mandoline.utils import NOT_GIVEN, process_get_options
 
 
-class Mandoline:
+class AsyncMandoline:
     """
-    Mandoline client for interacting with the Mandoline API.
+    Async Mandoline client for interacting with the Mandoline API.
 
-    This class provides methods to create, retrieve, update, and delete
-    metrics and evaluations. It handles authentication and request
-    management to the Mandoline API.
+    This class provides async methods to create, retrieve, update, and delete
+    metrics and evaluations with true concurrent batch operations.
     """
 
     def __init__(
@@ -39,7 +42,7 @@ class Mandoline:
         connect_timeout: Optional[float] = None,
         rwp_timeout: Optional[float] = None,
     ):
-        """Creates a new Mandoline client instance."""
+        """Creates a new AsyncMandoline client instance."""
         self.api_key = api_key or os.environ.get("MANDOLINE_API_KEY")
 
         config_dict = {
@@ -61,12 +64,14 @@ class Mandoline:
             )
         return {"X-API-KEY": self.api_key}
 
-    def _get(self, *, endpoint: str, params: Optional[SerializableDict] = None) -> Any:
+    async def _get(
+        self, *, endpoint: str, params: Optional[SerializableDict] = None
+    ) -> Any:
         if params and params.get("limit") and params["limit"] > MAX_GET_LIMIT:
             raise ValueError(
                 f"Limit exceeds maximum allowed value of {MAX_GET_LIMIT}. Please reduce the limit."
             )
-        return make_request(
+        return await make_async_request(
             config=self.request_config,
             options=RequestOptions(
                 method="GET",
@@ -76,8 +81,8 @@ class Mandoline:
             ),
         )
 
-    def _post(self, *, endpoint: str, data: SerializableDict) -> Any:
-        return make_request(
+    async def _post(self, *, endpoint: str, data: SerializableDict) -> Any:
+        return await make_async_request(
             config=self.request_config,
             options=RequestOptions(
                 method="POST",
@@ -87,8 +92,8 @@ class Mandoline:
             ),
         )
 
-    def _put(self, *, endpoint: str, data: SerializableDict) -> Any:
-        return make_request(
+    async def _put(self, *, endpoint: str, data: SerializableDict) -> Any:
+        return await make_async_request(
             config=self.request_config,
             options=RequestOptions(
                 method="PUT",
@@ -98,8 +103,8 @@ class Mandoline:
             ),
         )
 
-    def _delete(self, *, endpoint: str) -> Any:
-        return make_request(
+    async def _delete(self, *, endpoint: str) -> Any:
+        return await make_async_request(
             config=self.request_config,
             options=RequestOptions(
                 method="DELETE",
@@ -109,7 +114,7 @@ class Mandoline:
         )
 
     # Metric methods
-    def create_metric(
+    async def create_metric(
         self,
         *,
         name: str,
@@ -119,15 +124,38 @@ class Mandoline:
         """Adds a new evaluation metric."""
         metric_create = MetricCreate(name=name, description=description, tags=tags)
 
-        data = self._post(endpoint="metrics/", data=metric_create.model_dump())
+        data = await self._post(endpoint="metrics/", data=metric_create.model_dump())
         return Metric.model_validate(data)
 
-    def get_metric(self, *, metric_id: UUID) -> Metric:
+    async def batch_create_metrics(
+        self,
+        *,
+        metrics: List[MetricCreate],
+    ) -> List[Metric]:
+        """Creates multiple metrics concurrently."""
+        requests = [
+            RequestOptions(
+                method="POST",
+                endpoint="metrics/",
+                auth_header=self._get_auth_header(),
+                data=metric.model_dump(),
+            )
+            for metric in metrics
+        ]
+
+        results = await make_concurrent_requests(
+            config=self.request_config,
+            requests=requests,
+        )
+
+        return [Metric.model_validate(result) for result in results]
+
+    async def get_metric(self, *, metric_id: UUID) -> Metric:
         """Fetches a specific metric by its unique identifier."""
-        data = self._get(endpoint=f"metrics/{metric_id}")
+        data = await self._get(endpoint=f"metrics/{metric_id}")
         return Metric.model_validate(data)
 
-    def get_metrics(
+    async def get_metrics(
         self,
         *,
         skip: int = 0,
@@ -137,10 +165,10 @@ class Mandoline:
     ) -> List[Metric]:
         """Retrieve a list of metrics with optional filtering."""
         params = process_get_options(skip=skip, limit=limit, tags=tags, filters=filters)
-        data = self._get(endpoint="metrics/", params=params)
+        data = await self._get(endpoint="metrics/", params=params)
         return [Metric.model_validate(metric_data) for metric_data in data]
 
-    def update_metric(
+    async def update_metric(
         self,
         *,
         metric_id: UUID,
@@ -155,17 +183,17 @@ class Mandoline:
             tags=tags,
         )
 
-        data = self._put(
+        data = await self._put(
             endpoint=f"metrics/{metric_id}", data=metric_update.model_dump()
         )
         return Metric.model_validate(data)
 
-    def delete_metric(self, *, metric_id: UUID) -> None:
+    async def delete_metric(self, *, metric_id: UUID) -> None:
         """Removes a metric permanently."""
-        self._delete(endpoint=f"metrics/{metric_id}")
+        await self._delete(endpoint=f"metrics/{metric_id}")
 
     # Evaluation methods
-    def create_evaluation(
+    async def create_evaluation(
         self,
         *,
         metric_id: UUID,
@@ -185,15 +213,65 @@ class Mandoline:
             properties=properties,
         )
 
-        data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
+        data = await self._post(
+            endpoint="evaluations/", data=evaluation_create.model_dump()
+        )
         return Evaluation.model_validate(data)
 
-    def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
+    async def batch_create_evaluations(
+        self,
+        *,
+        evaluations: List[EvaluationCreate],
+    ) -> List[Evaluation]:
+        """Creates multiple evaluations concurrently."""
+        requests = [
+            RequestOptions(
+                method="POST",
+                endpoint="evaluations/",
+                auth_header=self._get_auth_header(),
+                data=evaluation.model_dump(),
+            )
+            for evaluation in evaluations
+        ]
+
+        results = await make_concurrent_requests(
+            config=self.request_config,
+            requests=requests,
+        )
+
+        return [Evaluation.model_validate(result) for result in results]
+
+    async def batch_create_evaluations_for_metrics(
+        self,
+        *,
+        metric_ids: List[UUID],
+        prompt: str,
+        prompt_image: Optional[str] = None,
+        response: Optional[str] = None,
+        response_image: Optional[str] = None,
+        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+    ) -> List[Evaluation]:
+        """Creates evaluations across multiple metrics concurrently for a single prompt-response pair."""
+        evaluations = [
+            EvaluationCreate(
+                metric_id=metric_id,
+                prompt=prompt,
+                prompt_image=prompt_image,
+                response=response,
+                response_image=response_image,
+                properties=properties,
+            )
+            for metric_id in metric_ids
+        ]
+
+        return await self.batch_create_evaluations(evaluations=evaluations)
+
+    async def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
         """Fetches details of a specific evaluation."""
-        data = self._get(endpoint=f"evaluations/{evaluation_id}")
+        data = await self._get(endpoint=f"evaluations/{evaluation_id}")
         return Evaluation.model_validate(data)
 
-    def get_evaluations(
+    async def get_evaluations(
         self,
         *,
         skip: int = 0,
@@ -212,10 +290,10 @@ class Mandoline:
             properties=properties,
             filters=filters,
         )
-        data = self._get(endpoint="evaluations/", params=params)
+        data = await self._get(endpoint="evaluations/", params=params)
         return [Evaluation.model_validate(evaluation_data) for evaluation_data in data]
 
-    def update_evaluation(
+    async def update_evaluation(
         self,
         *,
         evaluation_id: UUID,
@@ -224,11 +302,11 @@ class Mandoline:
         """Modifies an existing evaluation's properties."""
         evaluation_update = EvaluationUpdate(properties=properties)
 
-        data = self._put(
+        data = await self._put(
             endpoint=f"evaluations/{evaluation_id}", data=evaluation_update.model_dump()
         )
         return Evaluation.model_validate(data)
 
-    def delete_evaluation(self, *, evaluation_id: UUID) -> None:
+    async def delete_evaluation(self, *, evaluation_id: UUID) -> None:
         """Removes an evaluation permanently."""
-        self._delete(endpoint=f"evaluations/{evaluation_id}")
+        await self._delete(endpoint=f"evaluations/{evaluation_id}")
