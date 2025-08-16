@@ -585,17 +585,17 @@ async def test_async_context_manager_with_api_call():
 
 
 @pytest.mark.asyncio
-async def test_async_context_manager_backwards_compatibility():
-    """Test that direct instantiation still works alongside context manager."""
-    # Direct instantiation (original way)
+async def test_async_client_instantiation_methods():
+    """Test different ways to instantiate AsyncMandoline."""
+    # Direct instantiation
     client = AsyncMandoline(api_key="test_key")
     assert isinstance(client, AsyncMandoline)
     assert client.api_key == "test_key"
 
-    # Context manager (new way)
+    # Context manager instantiation
     async with AsyncMandoline(api_key="test_key") as context_client:
         assert isinstance(context_client, AsyncMandoline)
         assert context_client.api_key == "test_key"
 
-    # Both should work the same way
+    # Should be same type
     assert type(client) == type(context_client)
