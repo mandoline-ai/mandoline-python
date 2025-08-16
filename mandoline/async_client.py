@@ -32,6 +32,10 @@ class AsyncMandoline:
 
     This class provides async methods to create, retrieve, update, and delete
     metrics and evaluations with true concurrent batch operations.
+
+    Can be used as an async context manager:
+        async with AsyncMandoline() as client:
+            metrics = await client.get_metrics()
     """
 
     def __init__(
@@ -56,6 +60,15 @@ class AsyncMandoline:
         self.request_config = MandolineRequestConfig.model_validate(
             obj=config_dict, strict=True
         )
+
+    async def __aenter__(self):
+        """Async context manager entry."""
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit."""
+        # Currently no cleanup needed as AsyncClient is created per request
+        pass
 
     def _get_auth_header(self) -> Headers:
         if not self.api_key:
