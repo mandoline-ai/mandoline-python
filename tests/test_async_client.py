@@ -554,3 +554,48 @@ async def test_delete_evaluation(async_mandoline_client):
 async def test_get_with_limit_exceeding_max(async_mandoline_client):
     with pytest.raises(ValueError):
         await async_mandoline_client._get(endpoint="test_endpoint", params={"limit": 1000000})
+
+
+@pytest.mark.asyncio
+async def test_async_context_manager():
+    """Test that AsyncMandoline can be used as an async context manager."""
+    async with AsyncMandoline(api_key="test_key") as client:
+        assert isinstance(client, AsyncMandoline)
+        assert client.api_key == "test_key"
+
+
+@pytest.mark.asyncio
+async def test_async_context_manager_with_api_call():
+    """Test async context manager with actual API call (mocked)."""
+    with patch(
+        "mandoline.async_connection_manager.make_async_request_with_timeout"
+    ) as mock_make_request:
+        mock_response = httpx.Response(
+            status_code=200,
+            json=[],
+            request=httpx.Request("GET", "https://test.api.com/metrics/"),
+        )
+        mock_make_request.return_value = mock_response
+
+        async with AsyncMandoline(api_key="test_key") as client:
+            metrics = await client.get_metrics()
+            assert isinstance(metrics, list)
+
+        mock_make_request.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_async_context_manager_backwards_compatibility():
+    """Test that direct instantiation still works alongside context manager."""
+    # Direct instantiation (original way)
+    client = AsyncMandoline(api_key="test_key")
+    assert isinstance(client, AsyncMandoline)
+    assert client.api_key == "test_key"
+
+    # Context manager (new way)
+    async with AsyncMandoline(api_key="test_key") as context_client:
+        assert isinstance(context_client, AsyncMandoline)
+        assert context_client.api_key == "test_key"
+
+    # Both should work the same way
+    assert type(client) == type(context_client)
