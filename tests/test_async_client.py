@@ -258,7 +258,9 @@ async def test_batch_create_metrics(async_mandoline_client):
         mock_make_request.side_effect = mock_responses
 
         metrics_to_create = [
-            MetricCreate(name="Test Metric 1", description="A test metric", tags=["test"]),
+            MetricCreate(
+                name="Test Metric 1", description="A test metric", tags=["test"]
+            ),
             MetricCreate(
                 name="Test Metric 2",
                 description="Another test metric",
@@ -266,7 +268,9 @@ async def test_batch_create_metrics(async_mandoline_client):
             ),
         ]
 
-        metrics = await async_mandoline_client.batch_create_metrics(metrics=metrics_to_create)
+        metrics = await async_mandoline_client.batch_create_metrics(
+            metrics=metrics_to_create
+        )
 
         assert len(metrics) == 2
         assert all(isinstance(metric, Metric) for metric in metrics)
@@ -278,7 +282,9 @@ async def test_batch_create_metrics(async_mandoline_client):
 
 @pytest.mark.asyncio
 @patch("mandoline.async_connection_manager.make_async_request_with_timeout")
-async def test_create_evaluation(mock_make_request, async_mandoline_client, mock_evaluation_data):
+async def test_create_evaluation(
+    mock_make_request, async_mandoline_client, mock_evaluation_data
+):
     mock_response = httpx.Response(
         status_code=200,
         json=mock_evaluation_data,
@@ -448,7 +454,9 @@ async def test_get_evaluation(async_mandoline_client):
         mock_make_request.return_value = mock_response
 
         evaluation_id = UUID("123e4567-e89b-12d3-a456-426614174000")
-        evaluation = await async_mandoline_client.get_evaluation(evaluation_id=evaluation_id)
+        evaluation = await async_mandoline_client.get_evaluation(
+            evaluation_id=evaluation_id
+        )
 
         assert evaluation.id == UUID("123e4567-e89b-12d3-a456-426614174000")
         assert evaluation.metric_id == UUID("234e5678-e89b-12d3-a456-426614174000")
@@ -553,7 +561,9 @@ async def test_delete_evaluation(async_mandoline_client):
 @pytest.mark.asyncio
 async def test_get_with_limit_exceeding_max(async_mandoline_client):
     with pytest.raises(ValueError):
-        await async_mandoline_client._get(endpoint="test_endpoint", params={"limit": 1000000})
+        await async_mandoline_client._get(
+            endpoint="test_endpoint", params={"limit": 1000000}
+        )
 
 
 @pytest.mark.asyncio

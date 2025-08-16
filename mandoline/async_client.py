@@ -32,7 +32,7 @@ class AsyncMandoline:
 
     This class provides async methods to create, retrieve, update, and delete
     metrics and evaluations with true concurrent batch operations.
-    
+
     Can be used as an async context manager:
         async with AsyncMandoline() as client:
             metrics = await client.get_metrics()
