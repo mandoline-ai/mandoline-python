@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 import httpx
 from pydantic import BaseModel
@@ -46,12 +46,12 @@ class HTTPErrorDetails(BaseErrorDetails):
     status_code: int
     status_text: str
     response_text: str
-    response_json: Optional[Dict[str, Any]] = None
+    response_json: Optional[dict[str, Any]] = None
 
 
 class RequestErrorDetails(BaseErrorDetails):
     type: Literal[MandolineErrorType.RequestError] = MandolineErrorType.RequestError
-    request: Dict[str, str]
+    request: dict[str, str]
 
 
 class GenericErrorDetails(BaseErrorDetails):

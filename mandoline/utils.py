@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 from uuid import UUID
 
 from mandoline.config import DEFAULT_INCLUDE_EVALUATION_CONTENT
@@ -25,7 +25,7 @@ def make_serializable(*, data: dict) -> SerializableDict:
     return serializable_data
 
 
-def safe_json_parse(*, json_string: str) -> Optional[Dict[str, Any]]:
+def safe_json_parse(*, json_string: str) -> Optional[dict[str, Any]]:
     try:
         return json.loads(json_string)
     except Exception:

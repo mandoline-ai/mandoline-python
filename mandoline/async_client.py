@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 from uuid import UUID
 
 from mandoline.async_connection_manager import (
@@ -152,8 +152,8 @@ class AsyncMandoline:
     async def batch_create_metrics(
         self,
         *,
-        metrics: List[MetricCreate],
-    ) -> List[Metric]:
+        metrics: list[MetricCreate],
+    ) -> list[Metric]:
         """Creates multiple metrics concurrently."""
         requests = [
             RequestOptions(
@@ -184,7 +184,7 @@ class AsyncMandoline:
         limit: int = DEFAULT_GET_LIMIT,
         tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
         filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Metric]:
+    ) -> list[Metric]:
         """Retrieve a list of metrics with optional filtering."""
         params = process_get_options(skip=skip, limit=limit, tags=tags, filters=filters)
         data = await self._get(endpoint="metrics/", params=params)
@@ -245,9 +245,9 @@ class AsyncMandoline:
     async def batch_create_evaluations(
         self,
         *,
-        evaluations: List[EvaluationCreate],
+        evaluations: list[EvaluationCreate],
         include_content: bool = True,
-    ) -> List[Evaluation]:
+    ) -> list[Evaluation]:
         """Creates multiple evaluations concurrently."""
         params = {"include_content": include_content}
         requests = [
@@ -271,14 +271,14 @@ class AsyncMandoline:
     async def batch_create_evaluations_for_metrics(
         self,
         *,
-        metric_ids: List[UUID],
+        metric_ids: list[UUID],
         prompt: str,
         prompt_image: Optional[str] = None,
         response: Optional[str] = None,
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
         include_content: bool = True,
-    ) -> List[Evaluation]:
+    ) -> list[Evaluation]:
         """
         Creates evaluations across multiple metrics concurrently for a single
         prompt-response pair.
@@ -316,7 +316,7 @@ class AsyncMandoline:
         include_content: Union[bool, NotGiven] = NOT_GIVEN,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
         filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Evaluation]:
+    ) -> list[Evaluation]:
         """Retrieve a list of evaluations with optional filtering."""
         params = process_get_options(
             skip=skip,

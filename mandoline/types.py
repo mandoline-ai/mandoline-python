@@ -1,8 +1,8 @@
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, model_serializer
 
-Headers = Dict[str, str]
+Headers = dict[str, str]
 
 
 class NotGiven(BaseModel):
@@ -22,8 +22,8 @@ class NotGiven(BaseModel):
         return str(self)
 
 
-SerializableDict = Dict[str, Any]
+SerializableDict = dict[str, Any]
 NullableSerializableDict = Optional[SerializableDict]
 
-StringArray = List[str]
+StringArray = list[str]
 NullableStringArray = Optional[StringArray]

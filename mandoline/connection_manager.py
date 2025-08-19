@@ -1,4 +1,4 @@
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Literal, Optional
 from urllib.parse import urlencode
 
 from httpx import Client, Response, Timeout
@@ -24,7 +24,7 @@ def process_url(
     return f"{api_base_url}/{endpoint}?{query_string}"
 
 
-def process_request_body(*, data: Optional[SerializableDict] = None) -> Dict[str, Any]:
+def process_request_body(*, data: Optional[SerializableDict] = None) -> dict[str, Any]:
     if not data:
         return {}
 
@@ -37,8 +37,8 @@ def make_request_with_timeout(
     config: MandolineRequestConfig,
     method: str,
     url: str,
-    headers: Dict[str, str],
-    body: Dict[str, Any],
+    headers: dict[str, str],
+    body: dict[str, Any],
 ) -> Response:
     timeout = Timeout(
         connect=config.connect_timeout,

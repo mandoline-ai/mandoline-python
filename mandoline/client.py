@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 from uuid import UUID
 
 from mandoline.config import DEFAULT_GET_LIMIT, MAX_GET_LIMIT, MandolineRequestConfig
@@ -143,7 +143,7 @@ class Mandoline:
         limit: int = DEFAULT_GET_LIMIT,
         tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
         filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Metric]:
+    ) -> list[Metric]:
         """Retrieve a list of metrics with optional filtering."""
         params = process_get_options(skip=skip, limit=limit, tags=tags, filters=filters)
         data = self._get(endpoint="metrics/", params=params)
@@ -218,7 +218,7 @@ class Mandoline:
         include_content: Union[bool, NotGiven] = NOT_GIVEN,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
         filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Evaluation]:
+    ) -> list[Evaluation]:
         """Retrieve a list of evaluations with optional filtering."""
         params = process_get_options(
             skip=skip,

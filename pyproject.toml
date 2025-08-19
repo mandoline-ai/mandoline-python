@@ -11,15 +11,13 @@ dependencies = [
     "httpx>=0.23.0, <1",
     "pydantic>=1.9.0, <3",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -59,7 +57,7 @@ include = [
 
 [tool.ruff]
 line-length = 88
-target-version = "py37"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = [

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Union
+from typing import Any, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -16,7 +16,7 @@ from mandoline.utils import NOT_GIVEN
 class MandolineBase(BaseModel):
     model_config = {"extra": "forbid", "arbitrary_types_allowed": True}
 
-    def model_dump(self, *args, **kwargs) -> Dict[str, Any]:
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
         """Omit fields with a value of NotGiven"""
         dump = super().model_dump(*args, **kwargs)
         return {k: v for k, v in dump.items() if v != str(NOT_GIVEN)}
@@ -82,7 +82,7 @@ class EvaluationBase(MandolineBase):
 
 class EvaluationCreate(EvaluationBase):
     @model_validator(mode="before")
-    def validate_response_fields(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_response_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
         prompt_image = values.get("prompt_image")
         response = values.get("response")
         response_image = values.get("response_image")
