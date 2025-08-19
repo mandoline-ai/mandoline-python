@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 from httpx import Client, Response, Timeout
@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 
 def process_url(
-    *, api_base_url: str, endpoint: str, params: Optional[SerializableDict] = None
+    *, api_base_url: str, endpoint: str, params: SerializableDict | None = None
 ) -> str:
     if not params:
         return f"{api_base_url}/{endpoint}"
@@ -24,7 +24,7 @@ def process_url(
     return f"{api_base_url}/{endpoint}?{query_string}"
 
 
-def process_request_body(*, data: Optional[SerializableDict] = None) -> dict[str, Any]:
+def process_request_body(*, data: SerializableDict | None = None) -> dict[str, Any]:
     if not data:
         return {}
 
@@ -62,8 +62,8 @@ class RequestOptions(BaseModel):
     method: Literal["GET", "POST", "PUT", "DELETE"]
     endpoint: str
     auth_header: Headers
-    params: Optional[SerializableDict] = None
-    data: Optional[SerializableDict] = None
+    params: SerializableDict | None = None
+    data: SerializableDict | None = None
 
 
 def make_request(*, config: MandolineRequestConfig, options: RequestOptions) -> Any:

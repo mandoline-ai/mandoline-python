@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Union
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -46,9 +46,7 @@ class IDAndTimestampsMixin(BaseModel):
 class MetricBase(MandolineBase):
     name: str
     description: str
-    tags: Union[NullableStringArray, NotGiven] = Field(
-        default_factory=lambda: NOT_GIVEN
-    )
+    tags: NullableStringArray | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
 
 
 class MetricCreate(MetricBase):
@@ -56,11 +54,9 @@ class MetricCreate(MetricBase):
 
 
 class MetricUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
-    name: Union[str, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    description: Union[str, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    tags: Union[NullableStringArray, NotGiven] = Field(
-        default_factory=lambda: NOT_GIVEN
-    )
+    name: str | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    description: str | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    tags: NullableStringArray | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
 
 
 class Metric(MetricBase, IDAndTimestampsMixin):
@@ -69,13 +65,11 @@ class Metric(MetricBase, IDAndTimestampsMixin):
 
 class EvaluationBase(MandolineBase):
     metric_id: UUID
-    prompt: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    prompt_image: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    response: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    response_image: Union[str, None, NotGiven] = Field(
-        default_factory=lambda: NOT_GIVEN
-    )
-    properties: Union[NullableSerializableDict, NotGiven] = Field(
+    prompt: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    prompt_image: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    response: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    response_image: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    properties: NullableSerializableDict | NotGiven = Field(
         default_factory=lambda: NOT_GIVEN
     )
 
@@ -110,7 +104,7 @@ class EvaluationCreate(EvaluationBase):
 
 
 class EvaluationUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
-    properties: Union[NullableSerializableDict, NotGiven] = Field(
+    properties: NullableSerializableDict | NotGiven = Field(
         default_factory=lambda: NOT_GIVEN
     )
 

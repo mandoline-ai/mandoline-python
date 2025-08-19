@@ -1,5 +1,5 @@
 import json
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 from mandoline.config import DEFAULT_INCLUDE_EVALUATION_CONTENT
@@ -25,7 +25,7 @@ def make_serializable(*, data: dict) -> SerializableDict:
     return serializable_data
 
 
-def safe_json_parse(*, json_string: str) -> Optional[dict[str, Any]]:
+def safe_json_parse(*, json_string: str) -> dict[str, Any] | None:
     try:
         return json.loads(json_string)
     except Exception:
@@ -36,11 +36,11 @@ def process_get_options(
     *,
     skip: int,
     limit: int,
-    tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
-    metric_id: Union[UUID, NotGiven] = NOT_GIVEN,
-    include_content: Union[bool, NotGiven] = NOT_GIVEN,
-    properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
-    filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
+    tags: NullableStringArray | NotGiven = NOT_GIVEN,
+    metric_id: UUID | NotGiven = NOT_GIVEN,
+    include_content: bool | NotGiven = NOT_GIVEN,
+    properties: NullableSerializableDict | NotGiven = NOT_GIVEN,
+    filters: SerializableDict | NotGiven = NOT_GIVEN,
 ) -> SerializableDict:
     """Helper function for processing get options for both sync and async clients."""
     params: SerializableDict = {"skip": skip, "limit": limit}

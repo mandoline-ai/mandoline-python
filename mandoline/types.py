@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, model_serializer
 
@@ -23,7 +23,7 @@ class NotGiven(BaseModel):
 
 
 SerializableDict = dict[str, Any]
-NullableSerializableDict = Optional[SerializableDict]
+NullableSerializableDict = SerializableDict | None
 
 StringArray = list[str]
-NullableStringArray = Optional[StringArray]
+NullableStringArray = StringArray | None

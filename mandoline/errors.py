@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 import httpx
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ class HTTPErrorDetails(BaseErrorDetails):
     status_code: int
     status_text: str
     response_text: str
-    response_json: Optional[dict[str, Any]] = None
+    response_json: dict[str, Any] | None = None
 
 
 class RequestErrorDetails(BaseErrorDetails):
@@ -56,19 +56,19 @@ class RequestErrorDetails(BaseErrorDetails):
 
 class GenericErrorDetails(BaseErrorDetails):
     type: Literal[MandolineErrorType.GenericError] = MandolineErrorType.GenericError
-    status_code: Optional[int] = None
-    errors: Optional[str] = None
-    stack: Optional[str] = None
+    status_code: int | None = None
+    errors: str | None = None
+    stack: str | None = None
 
 
-MandolineErrorDetails = Union[
-    ValidationErrorDetails,
-    RateLimitExceededErrorDetails,
-    TimeoutErrorDetails,
-    HTTPErrorDetails,
-    RequestErrorDetails,
-    GenericErrorDetails,
-]
+MandolineErrorDetails = (
+    ValidationErrorDetails
+    | RateLimitExceededErrorDetails
+    | TimeoutErrorDetails
+    | HTTPErrorDetails
+    | RequestErrorDetails
+    | GenericErrorDetails
+)
 
 
 class MandolineError(Exception):
@@ -143,7 +143,7 @@ def create_http_error_details(*, response: httpx.Response) -> MandolineErrorDeta
 
 
 def create_error_details(*, error: Exception) -> MandolineErrorDetails:
-    if isinstance(error, (httpx.ConnectTimeout, httpx.ReadTimeout, TimeoutError)):
+    if isinstance(error, httpx.ConnectTimeout | httpx.ReadTimeout | TimeoutError):
         return TimeoutErrorDetails(
             message="The request timed out. The API might be slow or unresponsive. "
             "Please try again later."
