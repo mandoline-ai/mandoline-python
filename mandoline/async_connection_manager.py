@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Dict, List
+from typing import Any
 
 from httpx import AsyncClient, Response, Timeout
 
@@ -21,8 +21,8 @@ async def make_async_request_with_timeout(
     config: MandolineRequestConfig,
     method: str,
     url: str,
-    headers: Dict[str, str],
-    body: Dict[str, Any],
+    headers: dict[str, str],
+    body: dict[str, Any],
 ) -> Response:
     timeout = Timeout(
         connect=config.connect_timeout,
@@ -56,14 +56,14 @@ async def make_async_request(
         )
         return process_response(response=response)
     except Exception as error:
-        raise handle_error(err=error)
+        raise handle_error(err=error) from error
 
 
 async def make_concurrent_requests(
     *,
     config: MandolineRequestConfig,
-    requests: List[RequestOptions],
-) -> List[Any]:
+    requests: list[RequestOptions],
+) -> list[Any]:
     """Make multiple requests concurrently."""
     tasks = [
         make_async_request(config=config, options=request_options)

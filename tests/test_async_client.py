@@ -608,7 +608,7 @@ async def test_async_client_instantiation_methods():
         assert context_client.api_key == "test_key"
 
     # Should be same type
-    assert type(client) == type(context_client)
+    assert isinstance(client, type(context_client))
 
 
 @pytest.mark.asyncio

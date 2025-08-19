@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Optional, Union
+from typing import Any
 from uuid import UUID
 
 from mandoline.async_connection_manager import (
@@ -41,10 +41,10 @@ class AsyncMandoline:
     def __init__(
         self,
         *,
-        api_key: Optional[str] = None,
-        api_base_url: Optional[str] = None,
-        connect_timeout: Optional[float] = None,
-        rwp_timeout: Optional[float] = None,
+        api_key: str | None = None,
+        api_base_url: str | None = None,
+        connect_timeout: float | None = None,
+        rwp_timeout: float | None = None,
     ):
         """Creates a new AsyncMandoline client instance."""
         self.api_key = api_key or os.environ.get("MANDOLINE_API_KEY")
@@ -73,16 +73,18 @@ class AsyncMandoline:
     def _get_auth_header(self) -> Headers:
         if not self.api_key:
             raise ValueError(
-                "Mandoline API key required. Set MANDOLINE_API_KEY environment variable or create one at https://mandoline.ai/account"
+                "Mandoline API key required. Set MANDOLINE_API_KEY environment "
+                "variable or create one at https://mandoline.ai/account"
             )
         return {"X-API-KEY": self.api_key}
 
     async def _get(
-        self, *, endpoint: str, params: Optional[SerializableDict] = None
+        self, *, endpoint: str, params: SerializableDict | None = None
     ) -> Any:
         if params and params.get("limit") and params["limit"] > MAX_GET_LIMIT:
             raise ValueError(
-                f"Limit exceeds maximum allowed value of {MAX_GET_LIMIT}. Please reduce the limit."
+                f"Limit exceeds maximum allowed value of {MAX_GET_LIMIT}. "
+                "Please reduce the limit."
             )
         return await make_async_request(
             config=self.request_config,
@@ -99,7 +101,7 @@ class AsyncMandoline:
         *,
         endpoint: str,
         data: SerializableDict,
-        params: Optional[SerializableDict] = None,
+        params: SerializableDict | None = None,
     ) -> Any:
         return await make_async_request(
             config=self.request_config,
@@ -139,7 +141,7 @@ class AsyncMandoline:
         *,
         name: str,
         description: str,
-        tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
+        tags: NullableStringArray | NotGiven = NOT_GIVEN,
     ) -> Metric:
         """Adds a new evaluation metric."""
         metric_create = MetricCreate(name=name, description=description, tags=tags)
@@ -150,8 +152,8 @@ class AsyncMandoline:
     async def batch_create_metrics(
         self,
         *,
-        metrics: List[MetricCreate],
-    ) -> List[Metric]:
+        metrics: list[MetricCreate],
+    ) -> list[Metric]:
         """Creates multiple metrics concurrently."""
         requests = [
             RequestOptions(
@@ -180,9 +182,9 @@ class AsyncMandoline:
         *,
         skip: int = 0,
         limit: int = DEFAULT_GET_LIMIT,
-        tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
-        filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Metric]:
+        tags: NullableStringArray | NotGiven = NOT_GIVEN,
+        filters: SerializableDict | NotGiven = NOT_GIVEN,
+    ) -> list[Metric]:
         """Retrieve a list of metrics with optional filtering."""
         params = process_get_options(skip=skip, limit=limit, tags=tags, filters=filters)
         data = await self._get(endpoint="metrics/", params=params)
@@ -192,9 +194,9 @@ class AsyncMandoline:
         self,
         *,
         metric_id: UUID,
-        name: Union[str, NotGiven] = NOT_GIVEN,
-        description: Union[str, NotGiven] = NOT_GIVEN,
-        tags: Union[NullableStringArray, NotGiven] = NOT_GIVEN,
+        name: str | NotGiven = NOT_GIVEN,
+        description: str | NotGiven = NOT_GIVEN,
+        tags: NullableStringArray | NotGiven = NOT_GIVEN,
     ) -> Metric:
         """Modifies an existing metric's attributes."""
         metric_update = MetricUpdate(
@@ -218,10 +220,10 @@ class AsyncMandoline:
         *,
         metric_id: UUID,
         prompt: str,
-        prompt_image: Optional[str] = None,
-        response: Optional[str] = None,
-        response_image: Optional[str] = None,
-        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+        prompt_image: str | None = None,
+        response: str | None = None,
+        response_image: str | None = None,
+        properties: NullableSerializableDict | NotGiven = NOT_GIVEN,
         include_content: bool = True,
     ) -> Evaluation:
         """Performs an evaluation for a single metric on a prompt-response pair."""
@@ -243,9 +245,9 @@ class AsyncMandoline:
     async def batch_create_evaluations(
         self,
         *,
-        evaluations: List[EvaluationCreate],
+        evaluations: list[EvaluationCreate],
         include_content: bool = True,
-    ) -> List[Evaluation]:
+    ) -> list[Evaluation]:
         """Creates multiple evaluations concurrently."""
         params = {"include_content": include_content}
         requests = [
@@ -269,15 +271,18 @@ class AsyncMandoline:
     async def batch_create_evaluations_for_metrics(
         self,
         *,
-        metric_ids: List[UUID],
+        metric_ids: list[UUID],
         prompt: str,
-        prompt_image: Optional[str] = None,
-        response: Optional[str] = None,
-        response_image: Optional[str] = None,
-        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+        prompt_image: str | None = None,
+        response: str | None = None,
+        response_image: str | None = None,
+        properties: NullableSerializableDict | NotGiven = NOT_GIVEN,
         include_content: bool = True,
-    ) -> List[Evaluation]:
-        """Creates evaluations across multiple metrics concurrently for a single prompt-response pair."""
+    ) -> list[Evaluation]:
+        """
+        Creates evaluations across multiple metrics concurrently for a single
+        prompt-response pair.
+        """
         evaluations = [
             EvaluationCreate(
                 metric_id=metric_id,
@@ -307,11 +312,11 @@ class AsyncMandoline:
         *,
         skip: int = 0,
         limit: int = DEFAULT_GET_LIMIT,
-        metric_id: Union[UUID, NotGiven] = NOT_GIVEN,
-        include_content: Union[bool, NotGiven] = NOT_GIVEN,
-        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
-        filters: Union[SerializableDict, NotGiven] = NOT_GIVEN,
-    ) -> List[Evaluation]:
+        metric_id: UUID | NotGiven = NOT_GIVEN,
+        include_content: bool | NotGiven = NOT_GIVEN,
+        properties: NullableSerializableDict | NotGiven = NOT_GIVEN,
+        filters: SerializableDict | NotGiven = NOT_GIVEN,
+    ) -> list[Evaluation]:
         """Retrieve a list of evaluations with optional filtering."""
         params = process_get_options(
             skip=skip,
@@ -328,7 +333,7 @@ class AsyncMandoline:
         self,
         *,
         evaluation_id: UUID,
-        properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+        properties: NullableSerializableDict | NotGiven = NOT_GIVEN,
     ) -> Evaluation:
         """Modifies an existing evaluation's properties."""
         evaluation_update = EvaluationUpdate(properties=properties)

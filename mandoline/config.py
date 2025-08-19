@@ -22,7 +22,7 @@ class MandolineRequestConfig(BaseModel):
     )
     connect_timeout: float = Field(
         default=CONNECT_TIMEOUT,
-        description="The timeout (in seconds) for establishing a connection to the API.",
+        description="The timeout (in seconds) for establishing a connection.",
     )
     rwp_timeout: float = Field(
         default=RWP_TIMEOUT,

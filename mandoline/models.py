@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Union
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -14,9 +14,9 @@ from mandoline.utils import NOT_GIVEN
 
 
 class MandolineBase(BaseModel):
-    model_config = dict(extra="forbid", arbitrary_types_allowed=True)
+    model_config = {"extra": "forbid", "arbitrary_types_allowed": True}
 
-    def model_dump(self, *args, **kwargs) -> Dict[str, Any]:
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
         """Omit fields with a value of NotGiven"""
         dump = super().model_dump(*args, **kwargs)
         return {k: v for k, v in dump.items() if v != str(NOT_GIVEN)}
@@ -46,9 +46,7 @@ class IDAndTimestampsMixin(BaseModel):
 class MetricBase(MandolineBase):
     name: str
     description: str
-    tags: Union[NullableStringArray, NotGiven] = Field(
-        default_factory=lambda: NOT_GIVEN
-    )
+    tags: NullableStringArray | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
 
 
 class MetricCreate(MetricBase):
@@ -56,11 +54,9 @@ class MetricCreate(MetricBase):
 
 
 class MetricUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
-    name: Union[str, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    description: Union[str, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    tags: Union[NullableStringArray, NotGiven] = Field(
-        default_factory=lambda: NOT_GIVEN
-    )
+    name: str | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    description: str | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    tags: NullableStringArray | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
 
 
 class Metric(MetricBase, IDAndTimestampsMixin):
@@ -69,20 +65,18 @@ class Metric(MetricBase, IDAndTimestampsMixin):
 
 class EvaluationBase(MandolineBase):
     metric_id: UUID
-    prompt: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    prompt_image: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    response: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
-    response_image: Union[str, None, NotGiven] = Field(
-        default_factory=lambda: NOT_GIVEN
-    )
-    properties: Union[NullableSerializableDict, NotGiven] = Field(
+    prompt: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    prompt_image: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    response: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    response_image: str | None | NotGiven = Field(default_factory=lambda: NOT_GIVEN)
+    properties: NullableSerializableDict | NotGiven = Field(
         default_factory=lambda: NOT_GIVEN
     )
 
 
 class EvaluationCreate(EvaluationBase):
     @model_validator(mode="before")
-    def validate_response_fields(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_response_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
         prompt_image = values.get("prompt_image")
         response = values.get("response")
         response_image = values.get("response_image")
@@ -95,7 +89,8 @@ class EvaluationCreate(EvaluationBase):
         if response is None and not (prompt_image or response_image):
             raise ValueError("Response can only be None when images are provided")
 
-        # Must be a data URI of the form: f"data:image/{media_type};base64,{base64_encoded_data}"
+        # Must be a data URI of the form:
+        # f"data:image/{media_type};base64,{base64_encoded_data}"
         for img in (prompt_image, response_image):
             if img is not None:
                 if not isinstance(img, str):
@@ -109,7 +104,7 @@ class EvaluationCreate(EvaluationBase):
 
 
 class EvaluationUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
-    properties: Union[NullableSerializableDict, NotGiven] = Field(
+    properties: NullableSerializableDict | NotGiven = Field(
         default_factory=lambda: NOT_GIVEN
     )
 
