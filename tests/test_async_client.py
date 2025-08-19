@@ -624,7 +624,7 @@ async def test_include_content_parameter(mock_make_request, async_mandoline_clie
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
     }
-    
+
     mock_response = httpx.Response(
         status_code=200,
         json=mock_evaluation_data,
@@ -640,7 +640,7 @@ async def test_include_content_parameter(mock_make_request, async_mandoline_clie
         response="Test response",
         include_content=True,
     )
-    
+
     # Verify include_content=true was added to URL
     call_args = mock_make_request.call_args
     assert "include_content=True" in call_args[1]["url"]
@@ -650,7 +650,7 @@ async def test_include_content_parameter(mock_make_request, async_mandoline_clie
     await async_mandoline_client.get_evaluation(
         evaluation_id=evaluation_id, include_content=False
     )
-    
+
     # Verify include_content=false was added to URL
     call_args = mock_make_request.call_args
     assert "include_content=False" in call_args[1]["url"]
@@ -664,11 +664,11 @@ async def test_include_content_parameter(mock_make_request, async_mandoline_clie
         )
     ]
     mock_make_request.side_effect = [mock_response]
-    
+
     await async_mandoline_client.batch_create_evaluations(
         evaluations=evaluations_to_create, include_content=False
     )
-    
+
     # Verify include_content=false was added to URL for batch operation
     call_args = mock_make_request.call_args
     assert "include_content=False" in call_args[1]["url"]

@@ -427,7 +427,7 @@ def test_include_content_parameter(mock_make_request, mandoline_client):
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
     }
-    
+
     mock_response = httpx.Response(
         status_code=200,
         json=mock_evaluation_data,
@@ -443,17 +443,15 @@ def test_include_content_parameter(mock_make_request, mandoline_client):
         response="Test response",
         include_content=True,
     )
-    
+
     # Verify include_content=true was added to URL
     call_args = mock_make_request.call_args
     assert "include_content=True" in call_args[1]["url"]
 
     # Test get_evaluation with include_content=False
     evaluation_id = UUID("123e4567-e89b-12d3-a456-426614174000")
-    mandoline_client.get_evaluation(
-        evaluation_id=evaluation_id, include_content=False
-    )
-    
+    mandoline_client.get_evaluation(evaluation_id=evaluation_id, include_content=False)
+
     # Verify include_content=false was added to URL
     call_args = mock_make_request.call_args
     assert "include_content=False" in call_args[1]["url"]
@@ -464,7 +462,7 @@ def test_include_content_parameter(mock_make_request, mandoline_client):
         prompt="Test prompt",
         response="Test response",
     )
-    
+
     # Verify default include_content=true was used
     call_args = mock_make_request.call_args
     assert "include_content=True" in call_args[1]["url"]

@@ -76,7 +76,13 @@ class Mandoline:
             ),
         )
 
-    def _post(self, *, endpoint: str, data: SerializableDict, params: Optional[SerializableDict] = None) -> Any:
+    def _post(
+        self,
+        *,
+        endpoint: str,
+        data: SerializableDict,
+        params: Optional[SerializableDict] = None,
+    ) -> Any:
         return make_request(
             config=self.request_config,
             options=RequestOptions(
@@ -188,10 +194,14 @@ class Mandoline:
         )
 
         params = {"include_content": include_content}
-        data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump(), params=params)
+        data = self._post(
+            endpoint="evaluations/", data=evaluation_create.model_dump(), params=params
+        )
         return Evaluation.model_validate(data)
 
-    def get_evaluation(self, *, evaluation_id: UUID, include_content: bool = True) -> Evaluation:
+    def get_evaluation(
+        self, *, evaluation_id: UUID, include_content: bool = True
+    ) -> Evaluation:
         """Fetches details of a specific evaluation."""
         params = {"include_content": include_content}
         data = self._get(endpoint=f"evaluations/{evaluation_id}", params=params)

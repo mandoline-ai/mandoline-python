@@ -94,7 +94,13 @@ class AsyncMandoline:
             ),
         )
 
-    async def _post(self, *, endpoint: str, data: SerializableDict, params: Optional[SerializableDict] = None) -> Any:
+    async def _post(
+        self,
+        *,
+        endpoint: str,
+        data: SerializableDict,
+        params: Optional[SerializableDict] = None,
+    ) -> Any:
         return await make_async_request(
             config=self.request_config,
             options=RequestOptions(
@@ -284,9 +290,13 @@ class AsyncMandoline:
             for metric_id in metric_ids
         ]
 
-        return await self.batch_create_evaluations(evaluations=evaluations, include_content=include_content)
+        return await self.batch_create_evaluations(
+            evaluations=evaluations, include_content=include_content
+        )
 
-    async def get_evaluation(self, *, evaluation_id: UUID, include_content: bool = True) -> Evaluation:
+    async def get_evaluation(
+        self, *, evaluation_id: UUID, include_content: bool = True
+    ) -> Evaluation:
         """Fetches details of a specific evaluation."""
         params = {"include_content": include_content}
         data = await self._get(endpoint=f"evaluations/{evaluation_id}", params=params)
