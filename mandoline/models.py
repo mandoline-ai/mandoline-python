@@ -14,7 +14,7 @@ from mandoline.utils import NOT_GIVEN
 
 
 class MandolineBase(BaseModel):
-    model_config = dict(extra="forbid", arbitrary_types_allowed=True)
+    model_config = {"extra": "forbid", "arbitrary_types_allowed": True}
 
     def model_dump(self, *args, **kwargs) -> Dict[str, Any]:
         """Omit fields with a value of NotGiven"""
@@ -95,7 +95,8 @@ class EvaluationCreate(EvaluationBase):
         if response is None and not (prompt_image or response_image):
             raise ValueError("Response can only be None when images are provided")
 
-        # Must be a data URI of the form: f"data:image/{media_type};base64,{base64_encoded_data}"
+        # Must be a data URI of the form:
+        # f"data:image/{media_type};base64,{base64_encoded_data}"
         for img in (prompt_image, response_image):
             if img is not None:
                 if not isinstance(img, str):

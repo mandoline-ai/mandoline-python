@@ -56,7 +56,7 @@ async def make_async_request(
         )
         return process_response(response=response)
     except Exception as error:
-        raise handle_error(err=error)
+        raise handle_error(err=error) from error
 
 
 async def make_concurrent_requests(

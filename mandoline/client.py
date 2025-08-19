@@ -57,14 +57,16 @@ class Mandoline:
     def _get_auth_header(self) -> Headers:
         if not self.api_key:
             raise ValueError(
-                "Mandoline API key required. Set MANDOLINE_API_KEY environment variable or create one at https://mandoline.ai/account"
+                "Mandoline API key required. Set MANDOLINE_API_KEY environment "
+                "variable or create one at https://mandoline.ai/account"
             )
         return {"X-API-KEY": self.api_key}
 
     def _get(self, *, endpoint: str, params: Optional[SerializableDict] = None) -> Any:
         if params and params.get("limit") and params["limit"] > MAX_GET_LIMIT:
             raise ValueError(
-                f"Limit exceeds maximum allowed value of {MAX_GET_LIMIT}. Please reduce the limit."
+                f"Limit exceeds maximum allowed value of {MAX_GET_LIMIT}. "
+                "Please reduce the limit."
             )
         return make_request(
             config=self.request_config,

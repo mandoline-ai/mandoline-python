@@ -28,7 +28,7 @@ def make_serializable(*, data: dict) -> SerializableDict:
 def safe_json_parse(*, json_string: str) -> Optional[Dict[str, Any]]:
     try:
         return json.loads(json_string)
-    except:
+    except Exception:
         return None
 
 

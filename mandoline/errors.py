@@ -145,7 +145,8 @@ def create_http_error_details(*, response: httpx.Response) -> MandolineErrorDeta
 def create_error_details(*, error: Exception) -> MandolineErrorDetails:
     if isinstance(error, (httpx.ConnectTimeout, httpx.ReadTimeout, TimeoutError)):
         return TimeoutErrorDetails(
-            message="The request timed out. The API might be slow or unresponsive. Please try again later."
+            message="The request timed out. The API might be slow or unresponsive. "
+            "Please try again later."
         )
     else:
         return GenericErrorDetails(

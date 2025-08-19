@@ -85,4 +85,4 @@ def make_request(*, config: MandolineRequestConfig, options: RequestOptions) -> 
         )
         return process_response(response=response)
     except Exception as error:
-        raise handle_error(err=error)
+        raise handle_error(err=error) from error
