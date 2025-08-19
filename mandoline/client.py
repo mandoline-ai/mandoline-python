@@ -76,7 +76,13 @@ class Mandoline:
             ),
         )
 
-    def _post(self, *, endpoint: str, data: SerializableDict) -> Any:
+    def _post(
+        self,
+        *,
+        endpoint: str,
+        data: SerializableDict,
+        params: Optional[SerializableDict] = None,
+    ) -> Any:
         return make_request(
             config=self.request_config,
             options=RequestOptions(
@@ -84,6 +90,7 @@ class Mandoline:
                 endpoint=endpoint,
                 auth_header=self._get_auth_header(),
                 data=data,
+                params=params,
             ),
         )
 
@@ -174,6 +181,7 @@ class Mandoline:
         response: Optional[str] = None,
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+        include_content: bool = True,
     ) -> Evaluation:
         """Performs an evaluation for a single metric on a prompt-response pair."""
         evaluation_create = EvaluationCreate(
@@ -185,12 +193,18 @@ class Mandoline:
             properties=properties,
         )
 
-        data = self._post(endpoint="evaluations/", data=evaluation_create.model_dump())
+        params = {"include_content": include_content}
+        data = self._post(
+            endpoint="evaluations/", data=evaluation_create.model_dump(), params=params
+        )
         return Evaluation.model_validate(data)
 
-    def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
+    def get_evaluation(
+        self, *, evaluation_id: UUID, include_content: bool = True
+    ) -> Evaluation:
         """Fetches details of a specific evaluation."""
-        data = self._get(endpoint=f"evaluations/{evaluation_id}")
+        params = {"include_content": include_content}
+        data = self._get(endpoint=f"evaluations/{evaluation_id}", params=params)
         return Evaluation.model_validate(data)
 
     def get_evaluations(

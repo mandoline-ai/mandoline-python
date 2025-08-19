@@ -413,3 +413,56 @@ def test_delete_evaluation(mandoline_client):
 def test_get_with_limit_exceeding_max(mandoline_client):
     with pytest.raises(ValueError):
         mandoline_client._get(endpoint="test_endpoint", params={"limit": 1000000})
+
+
+@patch("mandoline.connection_manager.make_request_with_timeout")
+def test_include_content_parameter(mock_make_request, mandoline_client):
+    """Test that include_content parameter is passed correctly"""
+    mock_evaluation_data = {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "metric_id": "234e5678-e89b-12d3-a456-426614174000",
+        "prompt": "Test prompt",
+        "response": "Test response",
+        "score": 0.42,
+        "created_at": "2023-01-01T00:00:00Z",
+        "updated_at": "2023-01-01T00:00:00Z",
+    }
+
+    mock_response = httpx.Response(
+        status_code=200,
+        json=mock_evaluation_data,
+        request=httpx.Request("POST", "https://test.api.com/evaluations/"),
+    )
+    mock_make_request.return_value = mock_response
+
+    # Test create_evaluation with include_content=True
+    metric_id = UUID("234e5678-e89b-12d3-a456-426614174000")
+    mandoline_client.create_evaluation(
+        metric_id=metric_id,
+        prompt="Test prompt",
+        response="Test response",
+        include_content=True,
+    )
+
+    # Verify include_content=true was added to URL
+    call_args = mock_make_request.call_args
+    assert "include_content=True" in call_args[1]["url"]
+
+    # Test get_evaluation with include_content=False
+    evaluation_id = UUID("123e4567-e89b-12d3-a456-426614174000")
+    mandoline_client.get_evaluation(evaluation_id=evaluation_id, include_content=False)
+
+    # Verify include_content=false was added to URL
+    call_args = mock_make_request.call_args
+    assert "include_content=False" in call_args[1]["url"]
+
+    # Test create_evaluation default (should be True)
+    mandoline_client.create_evaluation(
+        metric_id=metric_id,
+        prompt="Test prompt",
+        response="Test response",
+    )
+
+    # Verify default include_content=true was used
+    call_args = mock_make_request.call_args
+    assert "include_content=True" in call_args[1]["url"]

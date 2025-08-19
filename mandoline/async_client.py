@@ -94,7 +94,13 @@ class AsyncMandoline:
             ),
         )
 
-    async def _post(self, *, endpoint: str, data: SerializableDict) -> Any:
+    async def _post(
+        self,
+        *,
+        endpoint: str,
+        data: SerializableDict,
+        params: Optional[SerializableDict] = None,
+    ) -> Any:
         return await make_async_request(
             config=self.request_config,
             options=RequestOptions(
@@ -102,6 +108,7 @@ class AsyncMandoline:
                 endpoint=endpoint,
                 auth_header=self._get_auth_header(),
                 data=data,
+                params=params,
             ),
         )
 
@@ -215,6 +222,7 @@ class AsyncMandoline:
         response: Optional[str] = None,
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+        include_content: bool = True,
     ) -> Evaluation:
         """Performs an evaluation for a single metric on a prompt-response pair."""
         evaluation_create = EvaluationCreate(
@@ -226,8 +234,9 @@ class AsyncMandoline:
             properties=properties,
         )
 
+        params = {"include_content": include_content}
         data = await self._post(
-            endpoint="evaluations/", data=evaluation_create.model_dump()
+            endpoint="evaluations/", data=evaluation_create.model_dump(), params=params
         )
         return Evaluation.model_validate(data)
 
@@ -235,14 +244,17 @@ class AsyncMandoline:
         self,
         *,
         evaluations: List[EvaluationCreate],
+        include_content: bool = True,
     ) -> List[Evaluation]:
         """Creates multiple evaluations concurrently."""
+        params = {"include_content": include_content}
         requests = [
             RequestOptions(
                 method="POST",
                 endpoint="evaluations/",
                 auth_header=self._get_auth_header(),
                 data=evaluation.model_dump(),
+                params=params,
             )
             for evaluation in evaluations
         ]
@@ -263,6 +275,7 @@ class AsyncMandoline:
         response: Optional[str] = None,
         response_image: Optional[str] = None,
         properties: Union[NullableSerializableDict, NotGiven] = NOT_GIVEN,
+        include_content: bool = True,
     ) -> List[Evaluation]:
         """Creates evaluations across multiple metrics concurrently for a single prompt-response pair."""
         evaluations = [
@@ -277,11 +290,16 @@ class AsyncMandoline:
             for metric_id in metric_ids
         ]
 
-        return await self.batch_create_evaluations(evaluations=evaluations)
+        return await self.batch_create_evaluations(
+            evaluations=evaluations, include_content=include_content
+        )
 
-    async def get_evaluation(self, *, evaluation_id: UUID) -> Evaluation:
+    async def get_evaluation(
+        self, *, evaluation_id: UUID, include_content: bool = True
+    ) -> Evaluation:
         """Fetches details of a specific evaluation."""
-        data = await self._get(endpoint=f"evaluations/{evaluation_id}")
+        params = {"include_content": include_content}
+        data = await self._get(endpoint=f"evaluations/{evaluation_id}", params=params)
         return Evaluation.model_validate(data)
 
     async def get_evaluations(

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -69,10 +69,12 @@ class Metric(MetricBase, IDAndTimestampsMixin):
 
 class EvaluationBase(MandolineBase):
     metric_id: UUID
-    prompt: Optional[str] = None
-    prompt_image: Optional[str] = None
-    response: Optional[str] = None
-    response_image: Optional[str] = None
+    prompt: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
+    prompt_image: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
+    response: Union[str, None, NotGiven] = Field(default_factory=lambda: NOT_GIVEN)
+    response_image: Union[str, None, NotGiven] = Field(
+        default_factory=lambda: NOT_GIVEN
+    )
     properties: Union[NullableSerializableDict, NotGiven] = Field(
         default_factory=lambda: NOT_GIVEN
     )
