@@ -609,3 +609,66 @@ async def test_async_client_instantiation_methods():
 
     # Should be same type
     assert type(client) == type(context_client)
+
+
+@pytest.mark.asyncio
+@patch("mandoline.async_connection_manager.make_async_request_with_timeout")
+async def test_include_content_parameter(mock_make_request, async_mandoline_client):
+    """Test that include_content parameter is passed correctly"""
+    mock_evaluation_data = {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "metric_id": "234e5678-e89b-12d3-a456-426614174000",
+        "prompt": "Test prompt",
+        "response": "Test response",
+        "score": 0.42,
+        "created_at": "2023-01-01T00:00:00Z",
+        "updated_at": "2023-01-01T00:00:00Z",
+    }
+    
+    mock_response = httpx.Response(
+        status_code=200,
+        json=mock_evaluation_data,
+        request=httpx.Request("POST", "https://test.api.com/evaluations/"),
+    )
+    mock_make_request.return_value = mock_response
+
+    # Test create_evaluation with include_content=True
+    metric_id = UUID("234e5678-e89b-12d3-a456-426614174000")
+    await async_mandoline_client.create_evaluation(
+        metric_id=metric_id,
+        prompt="Test prompt",
+        response="Test response",
+        include_content=True,
+    )
+    
+    # Verify include_content=true was added to URL
+    call_args = mock_make_request.call_args
+    assert "include_content=True" in call_args[1]["url"]
+
+    # Test get_evaluation with include_content=False
+    evaluation_id = UUID("123e4567-e89b-12d3-a456-426614174000")
+    await async_mandoline_client.get_evaluation(
+        evaluation_id=evaluation_id, include_content=False
+    )
+    
+    # Verify include_content=false was added to URL
+    call_args = mock_make_request.call_args
+    assert "include_content=False" in call_args[1]["url"]
+
+    # Test batch_create_evaluations with include_content=False
+    evaluations_to_create = [
+        EvaluationCreate(
+            metric_id=metric_id,
+            prompt="Test prompt",
+            response="Test response",
+        )
+    ]
+    mock_make_request.side_effect = [mock_response]
+    
+    await async_mandoline_client.batch_create_evaluations(
+        evaluations=evaluations_to_create, include_content=False
+    )
+    
+    # Verify include_content=false was added to URL for batch operation
+    call_args = mock_make_request.call_args
+    assert "include_content=False" in call_args[1]["url"]
