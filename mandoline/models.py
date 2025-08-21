@@ -74,7 +74,7 @@ class EvaluationBase(MandolineBase):
     )
 
 
-def _validate_evaluation_fields(values: dict[str, Any]) -> dict[str, Any]:
+def validate_evaluation_fields(values: dict[str, Any]) -> dict[str, Any]:
     """Validate evaluation fields according to the rules:
     - Either prompt or prompt_image must be provided
     - Either response or response_image must be provided
@@ -112,7 +112,7 @@ def _validate_evaluation_fields(values: dict[str, Any]) -> dict[str, Any]:
 class EvaluationCreate(EvaluationBase):
     @model_validator(mode="before")
     def validate_response_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
-        return _validate_evaluation_fields(values)
+        return validate_evaluation_fields(values)
 
 
 class EvaluationUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
