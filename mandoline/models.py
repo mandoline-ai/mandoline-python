@@ -74,33 +74,45 @@ class EvaluationBase(MandolineBase):
     )
 
 
+def validate_evaluation_fields(values: dict[str, Any]) -> dict[str, Any]:
+    """Validate evaluation fields according to the rules:
+    - Either prompt or prompt_image must be provided
+    - Either response or response_image must be provided
+    - Images must be valid data URIs
+    """
+    prompt = values.get("prompt")
+    prompt_image = values.get("prompt_image")
+    response = values.get("response")
+    response_image = values.get("response_image")
+
+    # Check prompt requirements
+    if prompt is None and prompt_image is None:
+        raise ValueError("Either prompt or prompt_image must be provided")
+
+    # Check response requirements
+    if response is None and response_image is None:
+        raise ValueError("Either response or response_image must be provided")
+
+    # Validate image data URI format
+    for field_name, img in [
+        ("prompt_image", prompt_image),
+        ("response_image", response_image),
+    ]:
+        if img is not None:
+            if not isinstance(img, str):
+                raise ValueError(f"{field_name} must be a string")
+            if not img.startswith("data:image/"):
+                raise ValueError(f"{field_name} must start with data:image/")
+            if ";base64," not in img:
+                raise ValueError(f"{field_name} must be base64 encoded")
+
+    return values
+
+
 class EvaluationCreate(EvaluationBase):
     @model_validator(mode="before")
     def validate_response_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
-        prompt_image = values.get("prompt_image")
-        response = values.get("response")
-        response_image = values.get("response_image")
-
-        # Validate response requirements
-        if response is None and response_image is None:
-            raise ValueError("Either response or response_image must be provided")
-
-        # Ensure response is None only with images
-        if response is None and not (prompt_image or response_image):
-            raise ValueError("Response can only be None when images are provided")
-
-        # Must be a data URI of the form:
-        # f"data:image/{media_type};base64,{base64_encoded_data}"
-        for img in (prompt_image, response_image):
-            if img is not None:
-                if not isinstance(img, str):
-                    raise ValueError("Image must be a string")
-                if not img.startswith("data:image/"):
-                    raise ValueError("Image must start with data:image/")
-                if ";base64," not in img:
-                    raise ValueError("Image must be base64 encoded")
-
-        return values
+        return validate_evaluation_fields(values)
 
 
 class EvaluationUpdate(MandolineBase, AtLeastOneFieldGivenMixin):
