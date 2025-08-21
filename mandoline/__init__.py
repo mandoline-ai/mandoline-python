@@ -8,6 +8,7 @@ from .models import (
     Metric,
     MetricCreate,
     MetricUpdate,
+    validate_evaluation_fields,
 )
 from .types import (
     NotGiven,
@@ -17,7 +18,7 @@ from .types import (
     StringArray,
 )
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 __all__ = [
     "AsyncMandoline",
@@ -34,4 +35,5 @@ __all__ = [
     "NullableStringArray",
     "SerializableDict",
     "StringArray",
+    "validate_evaluation_fields",
 ]
