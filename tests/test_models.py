@@ -89,7 +89,9 @@ def test_evaluation_base_invalid_no_response():
 
 
 def test_evaluation_base_invalid_image_format():
-    with pytest.raises(ValidationError, match="prompt_image must start with data:image/"):
+    with pytest.raises(
+        ValidationError, match="prompt_image must start with data:image/"
+    ):
         EvaluationCreate(
             metric_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
             prompt="Test prompt",
