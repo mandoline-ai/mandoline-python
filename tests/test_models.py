@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 import pytest
+from pydantic import ValidationError
 
 from mandoline.models import EvaluationBase, EvaluationCreate, Metric, MetricUpdate
 from mandoline.types import NotGiven
@@ -88,7 +89,7 @@ def test_evaluation_base_invalid_no_response():
 
 
 def test_evaluation_base_invalid_image_format():
-    with pytest.raises(ValueError, match="Image must start with data:image/"):
+    with pytest.raises(ValidationError, match="prompt_image must start with data:image/"):
         EvaluationCreate(
             metric_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
             prompt="Test prompt",
@@ -98,7 +99,7 @@ def test_evaluation_base_invalid_image_format():
 
 
 def test_evaluation_base_invalid_image_not_base64():
-    with pytest.raises(ValueError, match="Image must be base64 encoded"):
+    with pytest.raises(ValidationError, match="prompt_image must be base64 encoded"):
         EvaluationCreate(
             metric_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
             prompt="Test prompt",
